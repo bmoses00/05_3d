@@ -84,7 +84,10 @@ void parse_file ( char * filename,
   else
     f = fopen(filename, "r");
 
-  while ( fgets(line, sizeof(line), f) != NULL ) {
+  int i = 0;
+  while ( /*fgets(line, sizeof(line), f) != NULL*/i < 65 ) {
+    fgets(line, sizeof(line), f);
+    i++;
     line[strlen(line)-1]='\0';
     //printf(":%s:\n",line);
 
@@ -96,7 +99,7 @@ void parse_file ( char * filename,
     double theta;
     char axis;
     int type;
-    int step = 40;
+    int step = 50;
 
     if ( strncmp(line, "box", strlen(line)) == 0 ) {
       fgets(line, sizeof(line), f);
@@ -123,6 +126,10 @@ void parse_file ( char * filename,
       sscanf(line, "%lf %lf %lf %lf %lf",
              xvals, yvals, zvals, &r, &r2);
       add_torus( edges, xvals[0], yvals[0], zvals[0], r, r2, step);
+    }
+
+    if ( strncmp(line, "clear", strlen(line)) == 0 ) {
+      edges->lastcol = 0;
     }
 
     if ( strncmp(line, "circle", strlen(line)) == 0 ) {
@@ -217,25 +224,31 @@ void parse_file ( char * filename,
     }//end ident
 
     else if ( strncmp(line, "apply", strlen(line)) == 0 ) {
-      //printf("APPLY\t%s", line);
+      printf("apply\n");
       matrix_mult(transform, edges);
     }//end apply
 
+    else if ( strncmp(line, "add", strlen(line)) == 0 ) {
+      //printf("DISPLAY\t%s", line);
+      draw_lines(edges, s, c);
+    }//end display
+
     else if ( strncmp(line, "display", strlen(line)) == 0 ) {
       //printf("DISPLAY\t%s", line);
-      clear_screen(s);
+      // clear_screen(s);
       draw_lines(edges, s, c);
       display( s );
     }//end display
 
     else if ( strncmp(line, "save", strlen(line)) == 0 ) {
-      //printf("SAVE\t%s", line);
+      printf("save\n");
       fgets(line, sizeof(line), f);
       *strchr(line, '\n') = 0;
-      //printf("name: %s\n", line);
-      clear_screen(s);
+      printf("name: %s\n", line);
+      // clear_screen(s);
       draw_lines(edges, s, c);
       save_extension(s, line);
     }//end save
+    printf("%d\n", i);
   }
 }
